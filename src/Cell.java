@@ -3,17 +3,20 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Cell {
+    Type type = Type.NORMAL;
     Cell owner;
-    float global;
-    float local;
+    int global;
+    int local;
+    boolean visited = false;
     ArrayList<Cell> neigbours;
     Point pos;
 
     public Cell(Point pos) {
         neigbours = new ArrayList<>();
         this.pos = pos;
-        global = -Float.MAX_VALUE;
-        local = -Float.MAX_VALUE;
+        global = Integer.MAX_VALUE - 50;
+        local = Integer.MAX_VALUE - 50;
+
     }
 
     public boolean addNeigbour(Cell cell) {
@@ -24,13 +27,14 @@ public class Cell {
                 }
             }
         }
+       // System.out.println("adding neigbour");
         neigbours.add(cell);
         return true;
     }
 
     public void addNeigbours(ArrayList<Cell> cell) {
-        for (Cell newCell : cell) {
-            this.addNeigbour(newCell);
+        for(int i = 0; i < cell.size();i++){
+            this.addNeigbour(cell.get(i));
         }
     }
 }

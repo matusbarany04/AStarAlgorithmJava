@@ -5,7 +5,7 @@ import java.util.List;
 public class Cell {
     Type type = Type.NORMAL;
     Cell owner;
-    int global;
+    double global;
     int local;
     boolean visited = false;
     ArrayList<Cell> neigbours;

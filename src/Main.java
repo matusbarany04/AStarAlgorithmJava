@@ -13,8 +13,6 @@ public class Main {
     }
 
     public void start() {
-
-
         ArrayList<ArrayList<Cell>> grid = new ArrayList<>();
 
         ArrayList<Cell> knownCells = new ArrayList<>();
@@ -39,23 +37,16 @@ public class Main {
         // while ...
         knownCells.add(start);
         start.local = 0;
-        start.global = Math.abs(finish.pos.x - start.pos.x) + Math.abs(finish.pos.y - start.pos.y);
+        start.global = Math.sqrt(Math.pow(Math.abs(finish.pos.x - start.pos.x), 2) + Math.pow(Math.abs(finish.pos.y - start.pos.y),2));
 
 
         whileLoop(knownCells,grid);
 
-        Cell cell = finish.owner;
-        do {
-            System.out.println(cell.pos.x + " "  + cell.pos.y);
-            cell = cell.owner;
-        }while(cell.owner != null);
-
+        trackThePath(grid,knownCells);
     }
-
 
     public boolean whileLoop(ArrayList<Cell> knownCells,  ArrayList<ArrayList<Cell>> grid){
         while (!knownCells.isEmpty()) {
-            whileloop:
             knownCells.get(0).visited = true;
             knownCells.get(0).type = Type.VISITED;
             Cell testingCell = knownCells.get(0);
@@ -72,7 +63,7 @@ public class Main {
                 if (testingCell.local + 1 < neigbour.local) {
                     neigbour.owner = testingCell;
                     neigbour.local = testingCell.local + 1;
-                    neigbour.global = neigbour.local +  Math.abs(finish.pos.x - neigbour.pos.x) + Math.abs(finish.pos.y - neigbour.pos.y);
+                    neigbour.global = neigbour.local + Math.sqrt(Math.pow(Math.abs(finish.pos.x - neigbour.pos.x), 2) + Math.pow(Math.abs(finish.pos.y - neigbour.pos.y),2));
                     knownCells.add(neigbour);
                 }
 
@@ -87,6 +78,8 @@ public class Main {
 
             sort(knownCells);
 
+
+            render(grid);
         }
 
         return  false;
@@ -95,7 +88,7 @@ public class Main {
     public void addStartAndFinish(int x, int y, Cell c) {
         if (x == 0 && y == 0) {
             start = c;
-        } else if (x == size - 7 && y == 0) {
+        } else if (x == size - 7 && y == 3) {
             finish = c;
         }
     }
@@ -169,6 +162,45 @@ public class Main {
         }
 
     }
+
+    public void trackThePath(ArrayList<ArrayList<Cell>> grid, ArrayList<Cell> knownCells) {
+        Cell cell = finish.owner;
+        System.out.println(cell.pos.x + " "  + cell.pos.y);
+        do {
+            cell = cell.owner;
+            System.out.println(cell.pos.x + " "  + cell.pos.y);
+        }while(cell.owner != null);
+
+
+        for (ArrayList<Cell> arrayList : grid) {
+
+            for (Cell c : arrayList) {
+                char a = ' ';
+                switch (c.type) {
+                    case WALL:
+                        a = '#';
+                        break;
+                    case START:
+                        a = '0';
+                        break;
+                    case FINISH:
+                        a = 'W';
+                        break;
+                    case VISITED:
+                        a = '*';
+                        break;
+                    default:
+                        a = '.';
+                        break;
+                }
+
+                System.out.print(a + " ");
+            }
+            System.out.println();
+        }
+
+    }
+
 }
 
 

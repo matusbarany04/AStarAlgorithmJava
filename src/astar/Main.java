@@ -1,21 +1,38 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Scanner;
 import java.util.concurrent.ForkJoinPool;
 
 public class Main {
     Cell start;
     Cell finish;
+    Point startPos;
+    Point finsihPos;
     int size = 15;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         new Main().start();
     }
 
-    public void start() {
+    public void start() throws FileNotFoundException {
         ArrayList<ArrayList<Cell>> grid = new ArrayList<>();
 
         ArrayList<Cell> knownCells = new ArrayList<>();
+
+        startPos =new Point(0,0);
+        finsihPos =new Point(10,10);
+        Scanner scanner = new Scanner(new File("grid.txt"));
+
+        int lineNumber = 1;
+        while(scanner.hasNextLine()){
+            String line = scanner.nextLine();
+            System.out.println("line " + lineNumber + " :" + line);
+            lineNumber++;
+        }
 
         //make the grid
         for (int y = 0; y < size; y++) {
@@ -23,9 +40,10 @@ public class Main {
             for (int x = 0; x < size; x++) {
                 Cell c = new Cell(new Point(x, y));
                 grid.get(y).add(c);
-                this.addStartAndFinish(x, y, c);
+                this.addStartAndFinish(x, y, c,startPos,finsihPos);
             }
         }
+
 
         start.type = Type.START;
         finish.type = Type.FINISH;
@@ -51,6 +69,7 @@ public class Main {
             knownCells.get(0).type = Type.VISITED;
             Cell testingCell = knownCells.get(0);
             System.out.println("Hi im testing cell at " + testingCell.pos.x + " " + testingCell.pos.y);
+            //to see how to goes
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -58,14 +77,18 @@ public class Main {
             }
 
             for (int i = 0; i < testingCell.neigbours.size(); i++) {
+
                 Cell neigbour = testingCell.neigbours.get(i);
 
-                if (testingCell.local + 1 < neigbour.local) {
-                    neigbour.owner = testingCell;
-                    neigbour.local = testingCell.local + 1;
-                    neigbour.global = neigbour.local + Math.sqrt(Math.pow(Math.abs(finish.pos.x - neigbour.pos.x), 2) + Math.pow(Math.abs(finish.pos.y - neigbour.pos.y),2));
-                    knownCells.add(neigbour);
+                if(!neigbour.type.equals(Type.WALL)){
+                    if (testingCell.local + 1 < neigbour.local) {
+                        neigbour.owner = testingCell;
+                        neigbour.local = testingCell.local + 1;
+                        neigbour.global = neigbour.local + Math.sqrt(Math.pow(Math.abs(finish.pos.x - neigbour.pos.x), 2) + Math.pow(Math.abs(finish.pos.y - neigbour.pos.y),2));
+                        knownCells.add(neigbour);
+                    }
                 }
+
 
                 if (neigbour.equals(finish)) {
                     System.out.println("hey it's me");
@@ -85,10 +108,10 @@ public class Main {
         return  false;
     }
 
-    public void addStartAndFinish(int x, int y, Cell c) {
-        if (x == 0 && y == 0) {
+    public void addStartAndFinish(int x, int y, Cell c, Point startPos, Point finishPos) {
+        if (x == startPos.x && y == startPos.y) {
             start = c;
-        } else if (x == size - 7 && y == 3) {
+        } else if (x == size - finishPos.x && y == finishPos.y) {
             finish = c;
         }
     }
